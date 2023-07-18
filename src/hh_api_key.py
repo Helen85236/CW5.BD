@@ -4,7 +4,7 @@ import requests
 
 class HHApi:
     def __init__(self):
-        self.employer_data = None
+        self.employer_data = []
         self.url_hh = "https://api.hh.ru/vacancies"
 
     def get_vacancies(self, search_query):
