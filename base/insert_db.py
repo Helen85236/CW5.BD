@@ -3,14 +3,14 @@ from src.hh_api_key import HHApi
 from base.config import user, password
 
 
-def insert_data(dbname: str, search_query) -> None:
+def insert_data(dbname: str) -> None:
     conn = psycopg2.connect(database=dbname, user=user, password=password, host="localhost", port="5432")
     cur = conn.cursor()
     hh_api = HHApi()
-    employers_data, vacancies_data = hh_api.get_vacancies(search_query)
-
+    employers_data, vacancies_data = hh_api.get_vacancies()
+    print(employers_data)
     for employer in employers_data:
-        cur.execute("INSERT INTO employers (employer_id, name, url) VALUES (%s, %s, %s)",
+        cur.execute("INSERT INTO employers (employer_id, name, url) VALUES (%s, %s, %s) on conflict do nothing",
                     (employer['employer_id'], employer['name'], employer['url']))
     for vacancy in vacancies_data:
         cur.execute(

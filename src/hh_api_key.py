@@ -7,31 +7,34 @@ class HHApi:
         self.employer_data = []
         self.url_hh = "https://api.hh.ru/vacancies"
 
-    def get_vacancies(self, search_query):
-        params = {'text': search_query, 'per_page': 100, 'area': 113}
+    def get_vacancies(self):
+
+        search_ids=[1740,681672,84585,592442,3529,15748,1532045,67611,80,733]
+        params = {'employer_id': search_ids, 'per_page': 100}
         vacancies_data = []
         response = requests.get(self.url_hh, params)
         if response.status_code == 200:
+            print(response.json())
             vacancies = response.json()["items"]
             for vacancy in vacancies:
-                if vacancy['employer']['name'] == search_query:
-                    if vacancy['salary'] is not None:
-                        vacancy_data = {
-                            'id_vacancy': vacancy['id'],
-                            'employer_id': vacancy['employer']['id'],
-                            'vacancy_name': vacancy['name'],
-                            'description': vacancy['snippet']['responsibility'],
-                            'area': vacancy['area']['name'],
-                            'url': vacancy['alternate_url'],
-                            'salary_from': vacancy['salary']['from'],
-                            'salary_to': vacancy['salary']['to'],
-                            'currency': vacancy['salary']['currency'],
-                            'published_at': vacancy['published_at']
-                        }
-                        vacancies_data.append(vacancy_data)
-                        self.employer_data = HHApi.get_employers(vacancy_data['employer_id'])
-                    else:
-                        continue
+                # if vacancy['employer']['id'] == search_query:
+                if vacancy['salary'] is not None:
+                    vacancy_data = {
+                        'id_vacancy': vacancy['id'],
+                        'employer_id': vacancy['employer']['id'],
+                        'vacancy_name': vacancy['name'],
+                        'description': vacancy['snippet']['responsibility'],
+                        'area': vacancy['area']['name'],
+                        'url': vacancy['alternate_url'],
+                        'salary_from': vacancy['salary']['from'],
+                        'salary_to': vacancy['salary']['to'],
+                        'currency': vacancy['salary']['currency'],
+                        'published_at': vacancy['published_at']
+                    }
+                    vacancies_data.append(vacancy_data)
+                    self.employer_data.append({'employer_id': vacancy['employer']['id'], 'name': vacancy['employer']['name'], 'url': vacancy['employer']['url']})
+                else:
+                    continue
         else:
             print("Error:", response.status_code)
         return self.employer_data, vacancies_data
